@@ -1,4 +1,5 @@
 from workflow.schemas.coins import CoinTranding
+import math
 from workflow.schemas.coins_trending_api_response import (
     CoinData,
     CoinItem,
@@ -6,13 +7,19 @@ from workflow.schemas.coins_trending_api_response import (
     CoinsTrendingResponse,
     PriceChangePercentage,
 )
-from workflow.schemas.market_chart import MarketChartData, MarketChartItem
+from workflow.schemas.market_chart import (
+    MarketChartData,
+    MarketChartItem,
+    MarketChartPriceIndicatorItem,
+)
 from workflow.tasks.transform import (
     format_market_chart_data,
     format_trending_coins_data,
+    get_price_indicators,
 )
-from datetime import datetime
+from datetime import datetime, timedelta
 from workflow.schemas.coins_market_chart_api_response import MarketChartDataResponse
+from workflow.utils.math import calculate_moving_average, calculate_rsi
 
 
 def test_format_trending_coins_data_success():
@@ -137,3 +144,42 @@ def test_format_market_chart_data():
     result = format_market_chart_data.fn(response_data)
 
     assert result == expected_data
+
+
+def test_get_price_indicators():
+    start_date = datetime(2023, 1, 1)
+    days = 30
+    start_value = 100.0
+    increment = 1.0
+    prices = [
+        MarketChartItem(
+            value=start_value + i * increment, date=start_date + timedelta(days=i)
+        )
+        for i in range(days)
+    ]
+
+    expected_sma = calculate_moving_average([p.value for p in prices], window=20)
+    expected_rsi = calculate_rsi([p.value for p in prices], window=14)
+
+    expected_result = [
+        MarketChartPriceIndicatorItem(
+            date=p.date,
+            rsi=r,
+            sma=s,
+        )
+        for p, s, r in zip(prices, expected_sma, expected_rsi)
+    ]
+
+    result = get_price_indicators.fn(prices)
+
+    def value_equals(v1, v2):
+        if math.isnan(v1):
+            return math.isnan(v2)
+
+        return v1 == v2
+
+    assert len(result) == len(expected_result)
+    for res, exp in zip(result, expected_result):
+        assert res.date == exp.date
+        assert value_equals(res.rsi, exp.rsi)
+        assert value_equals(res.sma, exp.sma)

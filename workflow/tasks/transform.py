@@ -3,8 +3,13 @@ from datetime import datetime
 from prefect import task
 from workflow.schemas.coins import CoinTranding
 from workflow.schemas.coins_trending_api_response import CoinsTrendingResponse
-from workflow.schemas.market_chart import MarketChartData, MarketChartItem
+from workflow.schemas.market_chart import (
+    MarketChartData,
+    MarketChartItem,
+    MarketChartPriceIndicatorItem,
+)
 from workflow.schemas.coins_market_chart_api_response import MarketChartDataResponse
+from workflow.utils.math import calculate_moving_average, calculate_rsi
 
 
 @task
@@ -66,3 +71,32 @@ def format_market_chart_data(
         market_caps=list(map(convert_item, market_chat_data_response.market_caps)),
         total_volumes=list(map(convert_item, market_chat_data_response.total_volumes)),
     )
+
+
+@task
+def get_price_indicators(
+    prices: List[MarketChartItem],
+) -> List[MarketChartPriceIndicatorItem]:
+    """
+    Analyze historical prices and calculate technical indicators (RSI and SMA).
+
+    Args:
+        prices (List[MarketChartItem]): List of MarketChartItem objects containing historical price data.
+
+    Returns:
+        List[MarketChartPriceIndicatorItem]: A list of MarketChartPriceIndicatorItem objects, each containing
+        the RSI, SMA, and the corresponding date.
+    """
+    price_values = [p.value for p in prices]
+    sma = calculate_moving_average(price_values, window=20)
+
+    rsi = calculate_rsi(price_values, window=14)
+
+    return [
+        MarketChartPriceIndicatorItem(
+            date=p.date,
+            rsi=r,
+            sma=s,
+        )
+        for p, s, r in zip(prices, sma, rsi)
+    ]
