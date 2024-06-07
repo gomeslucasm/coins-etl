@@ -28,3 +28,17 @@ def mock_trending_coins_api(requests_mock):
         json=data,
     )
     return requests_mock
+
+
+@pytest.fixture()
+def mocked_database(mocker):
+    FakeDataBase = mocker.patch("workflow.utils.db.DataBase")
+    return FakeDataBase()
+
+
+@pytest.fixture()
+def mocked_notification_service(mocker):
+    FakeNotificationService = mocker.patch(
+        "workflow.utils.notification.NotificationService"
+    )
+    return FakeNotificationService()
