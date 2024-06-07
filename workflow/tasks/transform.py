@@ -1,8 +1,10 @@
-from typing import List
-
+from typing import List, Tuple
+from datetime import datetime
 from prefect import task
 from workflow.schemas.coins import CoinTranding
 from workflow.schemas.coins_trending_api_response import CoinsTrendingResponse
+from workflow.schemas.market_chart import MarketChartData, MarketChartItem
+from workflow.schemas.coins_market_chart_api_response import MarketChartDataResponse
 
 
 @task
@@ -38,3 +40,29 @@ def format_trending_coins_data(coins: CoinsTrendingResponse) -> List[CoinTrandin
         )
 
     return list(map(get_fields, coins.root))
+
+
+@task
+def format_market_chart_data(
+    market_chat_data_response: MarketChartDataResponse,
+) -> MarketChartData:
+    """
+    Format market chart data from the CoinGecko API response into a MarketChartData object.
+
+    Args:
+        market_chat_data_response (MarketChartDataResponse): The response object from the CoinGecko API containing market chart data.
+
+    Returns:
+        MarketChartData: A formatted MarketChartData object.
+    """
+
+    def convert_item(item: Tuple[int, float]):
+        return MarketChartItem(
+            value=item[1], date=datetime.fromtimestamp(item[0] / 1000)
+        )
+
+    return MarketChartData(
+        prices=list(map(convert_item, market_chat_data_response.prices)),
+        market_caps=list(map(convert_item, market_chat_data_response.market_caps)),
+        total_volumes=list(map(convert_item, market_chat_data_response.total_volumes)),
+    )

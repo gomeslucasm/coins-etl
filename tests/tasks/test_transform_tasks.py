@@ -6,7 +6,13 @@ from workflow.schemas.coins_trending_api_response import (
     CoinsTrendingResponse,
     PriceChangePercentage,
 )
-from workflow.tasks.transform import format_trending_coins_data
+from workflow.schemas.market_chart import MarketChartData, MarketChartItem
+from workflow.tasks.transform import (
+    format_market_chart_data,
+    format_trending_coins_data,
+)
+from datetime import datetime
+from workflow.schemas.coins_market_chart_api_response import MarketChartDataResponse
 
 
 def test_format_trending_coins_data_success():
@@ -71,3 +77,63 @@ def test_format_trending_coins_data_success():
         assert isinstance(coin.market_cap_btc, float)
         assert isinstance(coin.total_volume_usd, float)
         assert isinstance(coin.total_volume_btc, float)
+
+
+def test_format_market_chart_data():
+    response_data = MarketChartDataResponse(
+        prices=[
+            (1711843200000, 69702.3087473573),
+            (1711929600000, 71246.95144060145),
+            (1711983682000, 68887.74951585678),
+        ],
+        market_caps=[
+            (1711843200000, 1370247487960.0945),
+            (1711929600000, 1401370211582.3662),
+            (1711983682000, 1355701979725.1584),
+        ],
+        total_volumes=[
+            (1711843200000, 16408802301.837431),
+            (1711929600000, 19723005998.21497),
+            (1711983682000, 30137418199.643093),
+        ],
+    )
+
+    expected_data = MarketChartData(
+        prices=[
+            MarketChartItem(
+                value=69702.3087473573, date=datetime.fromtimestamp(1711843200)
+            ),
+            MarketChartItem(
+                value=71246.95144060145, date=datetime.fromtimestamp(1711929600)
+            ),
+            MarketChartItem(
+                value=68887.74951585678, date=datetime.fromtimestamp(1711983682)
+            ),
+        ],
+        market_caps=[
+            MarketChartItem(
+                value=1370247487960.0945, date=datetime.fromtimestamp(1711843200)
+            ),
+            MarketChartItem(
+                value=1401370211582.3662, date=datetime.fromtimestamp(1711929600)
+            ),
+            MarketChartItem(
+                value=1355701979725.1584, date=datetime.fromtimestamp(1711983682)
+            ),
+        ],
+        total_volumes=[
+            MarketChartItem(
+                value=16408802301.837431, date=datetime.fromtimestamp(1711843200)
+            ),
+            MarketChartItem(
+                value=19723005998.21497, date=datetime.fromtimestamp(1711929600)
+            ),
+            MarketChartItem(
+                value=30137418199.643093, date=datetime.fromtimestamp(1711983682)
+            ),
+        ],
+    )
+
+    result = format_market_chart_data.fn(response_data)
+
+    assert result == expected_data
