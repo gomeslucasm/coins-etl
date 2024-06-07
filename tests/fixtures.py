@@ -32,6 +32,18 @@ def mock_trending_coins_api(requests_mock):
     return requests_mock
 
 
+@pytest.fixture
+def mock_market_chart_api(requests_mock):
+    f = open(os.path.join(os.path.dirname(__file__), "mock", "market_chart.json"))
+    data = json.load(f)
+    url = f"{ENVIRONMENT.COINS_GECKO_BASE_URL}/coins/bitcoin/market_chart?vs_currency=usd&days=30"
+    requests_mock.get(
+        url,
+        json=data,
+    )
+    return requests_mock
+
+
 @pytest.fixture()
 def mocked_database(mocker):
     FakeDataBase = mocker.patch("workflow.utils.db.DataBase")

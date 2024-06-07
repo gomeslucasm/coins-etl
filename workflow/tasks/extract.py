@@ -3,6 +3,7 @@ from prefect.context import get_run_context
 import requests
 from workflow.config import ENVIRONMENT
 
+from workflow.schemas.coins_market_chart_api_response import MarketChartDataResponse
 from workflow.schemas.coins_trending_api_response import CoinsTrendingResponse
 import time
 
@@ -48,3 +49,25 @@ def fetch_trending_coins(n_coins: int) -> CoinsTrendingResponse:
     response = requests.get(url, timeout=3)
     response.raise_for_status()
     return CoinsTrendingResponse(response.json()["coins"][:n_coins])
+
+
+@task
+def fetch_historical_prices(
+    coin_id: str, vs_currency: str, days: int
+) -> MarketChartDataResponse:
+    """
+    Fetch historical prices for a specific coin.
+
+    Args:
+        coin_id (str): The ID of the coin.
+        vs_currency (str): The currency to compare against (e.g., 'usd', 'brl').
+        days (int): Number of days of historical data to retrieve.
+
+    Returns:
+        MarketChartData: A response object containing historical market data.
+
+    """
+    url = f"{ENVIRONMENT.COINS_GECKO_BASE_URL}/coins/{coin_id}/market_chart?vs_currency={vs_currency}&days={days}"
+    response = requests.get(url, timeout=3)
+    response.raise_for_status()
+    return MarketChartDataResponse(**response.json())
