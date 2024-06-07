@@ -33,4 +33,4 @@ jobs:
 
       - name: Publish coverage to GitHub Pages
         run: |
-          ghp-import -n -p -f htmlcov
+          poetry run ghp-import -n -p -f htmlcov
