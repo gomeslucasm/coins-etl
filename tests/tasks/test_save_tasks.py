@@ -38,8 +38,6 @@ def test_save_coins_tranding(mocked_database):
 
     result = save_coins_tranding.fn(data)
 
-    print("mocked_database = ", mocked_database)
-
     mocked_database.save.assert_called_once()
 
     args, kwargs = mocked_database.save.call_args
