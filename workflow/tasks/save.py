@@ -2,6 +2,7 @@ from typing import List
 from prefect import task
 from datetime import datetime
 from workflow.schemas.coins import CoinTranding
+from workflow.schemas.market_chart import MarketChartPriceIndicatorItem
 from workflow.utils.db import get_db
 
 
@@ -38,3 +39,31 @@ def save_coins_tranding(coins_tranding: List[CoinTranding]):
     )
 
     return saved
+
+
+@task
+def save_market_chart_price_indicator(
+    item: MarketChartPriceIndicatorItem, coin_id: str
+):
+    """
+    Save market chart price indicators (RSI and SMA) to the database.
+
+    Args:
+        item (MarketChartPriceIndicatorItem): The market chart price indicator item to be saved.
+        coin_id (str): id of the coin
+
+    Returns:
+        dict: The saved data including RSI, SMA, date, and processed timestamp.
+    """
+    db = get_db()
+
+    return db.save(
+        table_name="market_chart_price_indicator",
+        data=dict(
+            coin_id=coin_id,
+            rsi=item.rsi,
+            sma=item.sma,
+            date=item.date.isoformat(),
+            processed_at=datetime.now().isoformat(),
+        ),
+    )
