@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch, MagicMock
+from workflow.config import ENVIRONMENT
 from workflow.flows.trending_coins import trending_coins_market_data
-from workflow.config.settings import PRICE_CHANGE_PERCENTAGE_24H_USD_TRESHOLD
 from workflow.schemas.coins_trending_api_response import (
     CoinData,
     CoinItem,
@@ -103,5 +103,5 @@ def test_trending_coins_market_data(mocker):
     mock_format.assert_called_once_with(data)
     mock_save.assert_called_once_with(mock_format.return_value)
     mock_notify.assert_called_once_with(
-        mock_format.return_value, PRICE_CHANGE_PERCENTAGE_24H_USD_TRESHOLD
+        mock_format.return_value, ENVIRONMENT.PRICE_CHANGE_PERCENTAGE_24H_USD_TRESHOLD
     )

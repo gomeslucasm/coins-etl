@@ -1,5 +1,5 @@
 from prefect import flow
-from workflow.config.settings import PRICE_CHANGE_PERCENTAGE_24H_USD_TRESHOLD
+from workflow.config import ENVIRONMENT
 from workflow.tasks.save import save_coins_tranding
 from workflow.tasks.notify import send_coins_tranding_price_change_alert
 from workflow.tasks.transform import format_trending_coins_data
@@ -27,7 +27,7 @@ def trending_coins_market_data(n_coins: int = 5):
     formatted_trending_coins = format_trending_coins_data(trending_coins)
     save_coins_tranding(formatted_trending_coins)
     send_coins_tranding_price_change_alert(
-        formatted_trending_coins, PRICE_CHANGE_PERCENTAGE_24H_USD_TRESHOLD
+        formatted_trending_coins, ENVIRONMENT.PRICE_CHANGE_PERCENTAGE_24H_USD_TRESHOLD
     )
 
 
