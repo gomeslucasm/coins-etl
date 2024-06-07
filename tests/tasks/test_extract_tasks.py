@@ -7,7 +7,7 @@ from workflow.config.settings import COINS_GECKO_BASE_URL
 
 
 def test_fetch_trending_coins_success(mock_trending_coins_api):
-    result = fetch_trending_coins(n_coins=3)
+    result = fetch_trending_coins.fn(n_coins=3)
 
     assert isinstance(result, CoinsTrendingResponse)
     assert len(result.root) == 3
@@ -23,4 +23,4 @@ def test_fetch_trending_coins_api_failure(requests_mock):
     requests_mock.get(url, status_code=500)
 
     with pytest.raises(requests.exceptions.HTTPError):
-        fetch_trending_coins(n_coins=3)
+        fetch_trending_coins.fn(n_coins=3)

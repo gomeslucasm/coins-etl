@@ -53,7 +53,7 @@ def test_format_trending_coins_data_success():
         ]
     )
 
-    result = format_trending_coins_data(data)
+    result = format_trending_coins_data.fn(data)
 
     assert isinstance(result, list)
     assert len(result) == 2
