@@ -1,6 +1,8 @@
 from workflow.schemas.coins import CoinTranding
-from workflow.tasks.notify import send_coins_tranding_price_change_alert
+from workflow.schemas.market_chart import MarketChartPriceIndicatorItem
+from workflow.tasks.notify import send_coins_tranding_price_change_alert, send_rsi_alert
 from tests.fixtures import *
+from datetime import datetime
 
 
 @pytest.mark.parametrize("price_change_percentage_24h_usd", [5.1, -5.1, 5.0, -5.0])
@@ -84,3 +86,42 @@ def test_send_coins_tranding_price_change_alert_no_alert(
     )
 
     assert not mocked_notification_service.send.called
+
+
+def test_send_rsi_alert_overbought(mocked_notification_service):
+    indicator = MarketChartPriceIndicatorItem(
+        rsi=75.0, sma=100.0, date=datetime(2023, 1, 1)
+    )
+    coin_name = "Bitcoin"
+
+    send_rsi_alert.fn(indicator, coin_name)
+
+    mocked_notification_service.send.assert_called_once_with(
+        f"ALERT | RSI Overbought: Coin {coin_name} has an RSI of {indicator.rsi}, which is above the threshold of {ENVIRONMENT.RSI_OVERBOUGHT_THRESHOLD}. It might be a good time to consider selling."
+    )
+
+
+def test_send_rsi_alert_oversold(mocked_notification_service):
+    indicator = MarketChartPriceIndicatorItem(
+        rsi=25.0,
+        sma=100.0,
+        date=datetime(2023, 1, 1),
+    )
+    coin_name = "Bitcoin"
+
+    send_rsi_alert(indicator, coin_name)
+
+    mocked_notification_service.send.assert_called_once_with(
+        f"ALERT | RSI Oversold: Coin {coin_name} has an RSI of {indicator.rsi}, which is below the threshold of {ENVIRONMENT.RSI_OVERSOLD_THRESHOLD}. It might be a good time to consider buying."
+    )
+
+
+def test_send_rsi_alert_no_alert(mocked_notification_service):
+    indicator = MarketChartPriceIndicatorItem(
+        rsi=50.0, sma=100.0, date=datetime(2023, 1, 1)
+    )
+    coin_name = "Bitcoin"
+
+    send_rsi_alert(indicator, coin_name)
+
+    mocked_notification_service.send.assert_not_called()

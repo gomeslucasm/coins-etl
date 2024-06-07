@@ -7,6 +7,8 @@ class Environment:
     SIMULATE_TIMEOUT_FETCH_TRENDING_COINS = (
         os.getenv("SIMULATE_TIMEOUT_FETCH_TRENDING_COINS", "true") == "true"
     )
+    RSI_OVERBOUGHT_THRESHOLD = 70
+    RSI_OVERSOLD_THRESHOLD = 30
 
 
 ENVIRONMENT = Environment()
