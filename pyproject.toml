@@ -12,6 +12,7 @@ prefect = "^2.19.4"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.2"
+requests-mock = "^1.12.1"
 
 [build-system]
 requires = ["poetry-core"]
