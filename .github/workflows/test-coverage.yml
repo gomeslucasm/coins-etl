@@ -28,7 +28,7 @@ jobs:
           poetry install
 
       - name: run coverage
-        run: poetry run pytest --cov=api --cov-report=term-missing --cov-report=html
+        run: poetry run pytest --cov=workflow --cov-report=term-missing --cov-report=html
 
       - name: upload coverage
         uses: actions/upload-artifact@v2
