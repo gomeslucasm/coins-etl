@@ -32,5 +32,10 @@ jobs:
           poetry run pytest --cov=workflow --cov-report=html
 
       - name: Publish coverage to GitHub Pages
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          poetry run ghp-import -n -p -f htmlcov
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          poetry run ghp-import -n -p -f htmlcov -r origin -b gh-pages
+          git push -f https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }} gh-pages
