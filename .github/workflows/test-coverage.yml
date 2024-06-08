@@ -29,13 +29,12 @@ jobs:
 
       - name: Run tests and generate coverage report
         run: |
-          poetry run pytest --cov=workflow --cov-report=html
+          poetry run pytest --cov=workflow --cov-report=xml
 
       - name: Publish coverage to GitHub Pages
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          poetry run ghp-import -n -p -f htmlcov -r origin -b gh-pages
-          git push -f https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }} gh-pages
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          fail_ci_if_error: true
+          files: ./coverage.xml
+          verbose: true
