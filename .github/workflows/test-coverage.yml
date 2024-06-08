@@ -27,14 +27,20 @@ jobs:
         run: |
           poetry install
 
-      - name: Run tests and generate coverage report
-        run: |
-          poetry run pytest --cov=workflow --cov-report=xml
+      - name: run coverage
+        run: oetry run pytest --cov=api --cov-report=term-missing --cov-report=html
 
-      - name: Publish coverage to GitHub Pages
-        uses: codecov/codecov-action@v3
+      - name: upload coverage
+        uses: actions/upload-artifact@v2
         with:
-          token: ${{ secrets.GH_TOKEN }}
-          fail_ci_if_error: true
-          files: ./coverage.xml
-          verbose: true
+          name: coverage-report
+          path: htmlcov/
+
+      - name: Deploy to GitHub Pages
+        if: success()
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GH_TOKEN }}
+          publish_dir: ./htmlcov
+          user_name: "github-actions[bot]"
+          user_email: "github-actions[bot]@users.noreply.github.com"
