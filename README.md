@@ -70,7 +70,7 @@ poetry shell
 prefect server start
 ```
 
-O servidor do prefect pode ser acessdo em (http://localhost:4200)[http://localhost:4200].
+O servidor do prefect pode ser acessdo em [http://localhost:4200](http://localhost:4200).
 
 5. Execute os fluxos de trabalho:
 
@@ -86,7 +86,7 @@ Para executar o fluxo de dados de mercado das moedas em tendência:
 python -m workflow.flows.trending_coins
 ```
 
-Você pode verificar a execução dos flows em (http://localhost:4200/flow-runs)[http://localhost:4200/flow-runs].
+Você pode verificar a execução dos flows em [http://localhost:4200/flow-runs](http://localhost:4200/flow-runs).
 
 ## Deploy
 
@@ -105,7 +105,7 @@ Este comando servirá os flows trending_coins_market_data e analyze_bitcoin_pric
 - analyze_bitcoin_prices_deploy - Roda a cada 1 minuto
 - trending_coins_market_data - Roda a cada 30 minutos
 
-Os deploys podem ser verificados em (http://localhost:4200/deployments)[http://localhost:4200/deployments]
+Os deploys podem ser verificados em [http://localhost:4200/deployments](http://localhost:4200/deployments)
 
 ## Executando testes
 
