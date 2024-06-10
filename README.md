@@ -48,8 +48,8 @@ Para executar os fluxos ETL, siga os passos abaixo:
 1. Clone o repositório e entre no diretório do projeto:
 
 ```bash
-git clone https://github.com/seu-usuario/seu-repositorio.git
-cd seu-repositorio
+git clone https://github.com/gomeslucasm/coins-etl
+cd coins-etl
 ```
 
 2. Instale as dependências utilizando o Poetry:
@@ -64,7 +64,15 @@ poetry install
 poetry shell
 ```
 
-4. Execute os fluxos de trabalho:
+4. Executando o servidor do prefect:
+
+```bash
+prefect server start
+```
+
+O servidor do prefect pode ser acessdo em (http://localhost:4200)[http://localhost:4200].
+
+5. Execute os fluxos de trabalho:
 
 Para executar o fluxo de análise de preços do Bitcoin:
 
@@ -77,6 +85,27 @@ Para executar o fluxo de dados de mercado das moedas em tendência:
 ```bash
 python -m workflow.flows.trending_coins
 ```
+
+Você pode verificar a execução dos flows em (http://localhost:4200/flow-runs)[http://localhost:4200/flow-runs].
+
+## Deploy
+
+Para servir os flows utilizando o Prefect, siga os passos abaixo:
+
+O servidor do Prefect estará disponível em localhost:4200.
+
+Execute o script para servir os flows:
+
+```bash
+python -m workflow.serve
+```
+
+Este comando servirá os flows trending_coins_market_data e analyze_bitcoin_prices, como jobs agendados.
+
+- analyze_bitcoin_prices_deploy - Roda a cada 1 minuto
+- trending_coins_market_data - Roda a cada 30 minutos
+
+Os deploys podem ser verificados em (http://localhost:4200/deployments)[http://localhost:4200/deployments]
 
 ## Executando testes
 
